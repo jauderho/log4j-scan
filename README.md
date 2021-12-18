@@ -13,12 +13,20 @@
 - Supports DNS callback for vulnerability discovery and validation.
 - WAF Bypass payloads.
 
+---
+# 🚨 Announcement
+
+There is a patch bypass on Log4J v2.15.0 that allows a full RCE. FullHunt added community support for log4j-scan to reliably detect CVE-2021-45046. If you're having difficulty discovering and scanning your infrastructure at scale or keeping up with the Log4J threat, please get in touch at (team@fullhunt.io).
+
+![](https://dkh9ehwkisc4.cloudfront.net/static/files/d385f9d8-e2b1-4d72-b9c2-a62c4c1c34a0-Screenshot-cve-2021-45046-demo.png)
+
+---
+
 # Description
 
 We have been researching the Log4J RCE (CVE-2021-44228) since it was released, and we worked in preventing this vulnerability with our customers. We are open-sourcing an open detection and scanning tool for discovering and fuzzing for Log4J RCE CVE-2021-44228 vulnerability. This shall be used by security teams to scan their infrastructure for Log4J RCE, and also test for WAF bypasses that can result in achiving code execution on the organization's environment.
 
 It supports DNS OOB callbacks out of the box, there is no need to setup a DNS callback server.
-
 
 
 
@@ -37,7 +45,8 @@ optional arguments:
   -h, --help            show this help message and exit
   -u URL, --url URL     Check a single URL.
   -p PROXY, --proxy PROXY
-                        Send requests through proxy.
+                        Send requests through proxy. proxy should be specified in the format supported by requests
+                        (http[s]://<proxy-ip>:<proxy-port>)
   -l USEDLIST, --list USEDLIST
                         Check a list of URLs.
   --request-type REQUEST_TYPE
@@ -50,6 +59,8 @@ optional arguments:
   --wait-time WAIT_TIME
                         Wait time after all URLs are processed (in seconds) - [Default: 5].
   --waf-bypass          Extend scans with WAF bypass payloads.
+  --test-CVE-2021-45046
+                        Test using payloads for CVE-2021-45046 (detection payloads).
   --dns-callback-provider DNS_CALLBACK_PROVIDER
                         DNS Callback provider (Options: dnslog.cn, interact.sh) - [Default: interact.sh].
   --custom-dns-callback-host CUSTOM_DNS_CALLBACK_HOST
