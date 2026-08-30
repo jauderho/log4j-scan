@@ -1,0 +1,25 @@
+[project]
+name = "log4j-scan"
+version = "1.0.0"
+description = "A fully automated, accurate, and extensive scanner for finding vulnerable log4j hosts (CVE-2021-44228, CVE-2021-45046, CVE-2022-42889)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE.txt" }
+authors = [{ name = "Mazin Ahmed", email = "mazin@mazinahmed.net" }]
+keywords = ["log4j", "log4shell", "cve-2021-44228", "security", "scanner"]
+dependencies = [
+    "requests>=2.33.0",
+    "pycryptodome>=3.23.0",
+    "termcolor>=3.2.0",
+    # Transitive dependencies pinned to security-patched floors (Dependabot).
+    "urllib3>=2.7.0",
+    "idna>=3.15",
+]
+
+[project.urls]
+Homepage = "https://github.com/fullhunt/log4j-scan"
+Repository = "https://github.com/jauderho/log4j-scan"
+
+[tool.uv]
+# Application, not a distributable package: run with `uv run log4j-scan.py`.
+package = false
